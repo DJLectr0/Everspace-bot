@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from discord.ext import commands
 import random
 import requests
@@ -11,7 +12,8 @@ roles = list()
 alpha_role = None
 beta_role = None
 @bot.event
-async def on_ready():
+@asyncio.coroutine
+def on_ready():
     global alpha_role, beta_role, roles
     print('Logged in as')
     print(bot.user.name)
@@ -25,12 +27,14 @@ async def on_ready():
 
 
 @bot.event
-async def on_member_join(member):
+@asyncio.coroutine
+def on_member_join(member):
     #print(member)
-    await bot.send_message(member, "Hey it seems you joined the server for the first time. If you are an alpha or beta Everspace backer, please verify your status by sending the following in the #com-link channel on the Everspace server: `~verify your-everspace-forum-profile-url`. For example: `~verify http://forum.everspace-game.com/profile/"+member.name+"`")
+    yield from bot.send_message(member, "Hey it seems you joined the server for the first time. If you are an alpha or beta Everspace backer, please verify your status by sending the following in the #com-link channel on the Everspace server: `~verify your-everspace-forum-profile-url`. For example: `~verify http://forum.everspace-game.com/profile/"+member.name+"`")
 
 @bot.command(pass_context=True)
-async def verify(ctx, url:str):
+@asyncio.coroutine
+def verify(ctx, url:str):
     """Verifies a user using his/her forum profile.
     """
     global roles
@@ -38,7 +42,7 @@ async def verify(ctx, url:str):
         discord_name = ctx.message.author.name
         #print(ctx.message.author.name)
         if "forum.everspace-game.com/profile/" not in url:
-            await bot.say('Please use an Everspace Forum URL')
+            yield from bot.say('Please use an Everspace Forum URL')
             return
         r = requests.get(url)
         result = r.text
@@ -51,26 +55,26 @@ async def verify(ctx, url:str):
                 num_diff += 1
 
         if num_diff > 2:
-            await bot.say("Your username did not match your forum username. Please DM Grinn or Casper for manual verification.")
+            yield from bot.say("Your username did not match your forum username. Please DM Grinn or Casper for manual verification.")
             return
 
         if rank is None:
-            await bot.say("This profile does not seem to exist or you are not a Backer.")
+            yield from bot.say("This profile does not seem to exist or you are not a Backer.")
             return
 
         #Just testing how to add a user to a role, does not work yet
         if "Alpha" in rank["title"]:
-            await bot.add_roles(ctx.message.author, alpha_role)
+            yield from bot.add_roles(ctx.message.author, alpha_role)
 
         if "Beta" in rank["title"]:
-            await bot.add_roles(ctx.message.author, beta_role)
+            yield from bot.add_roles(ctx.message.author, beta_role)
 
     except Exception as e:
         print(e)
-        await bot.say("Error occured:"+str(e))
+        yield from bot.say("Error occured:"+str(e))
         return
 
-    await bot.say("Verified that you are a "+rank["title"])
+    yield from bot.say("Thank you! I have verified that you are a "+rank["title"]+". Welcome, Pilot!")
 
 
 bot.run('MTc2NzU4MzQ5MDAwNDc0NjI0.Cgkqig.6qHB5kx9UI-McWuwMF7zqW9QpP0')
