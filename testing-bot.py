@@ -30,25 +30,23 @@ def on_ready():
 @asyncio.coroutine
 def on_member_join(member):
     #print(member)
-    yield from bot.send_message(member, "Hey it seems you joined the server for the first time. If you are an alpha or beta Everspace backer, please verify your status by sending the following in the #com-link channel on the Everspace server: `~verify your-everspace-forum-profile-url`. For example: `~verify http://forum.everspace-game.com/profile/"+member.name+"`")
+    yield from bot.send_message(member, "Hey it seems you joined the server for the first time. If you are an alpha or beta Everspace backer, please verify your status by sending the following in the #com-link channel on the Everspace server: `~verify your-everspace-forum-profile-url`. For example: `~verify "+member.name+"`")
 
 @bot.command(pass_context=True)
 @asyncio.coroutine
-def verify(ctx, url:str):
-    """Verifies a user using his/her forum profile.
+def verify(ctx, username:str):
+    """Verifies a user using his/her forum profile. Example: ~verify name
     """
     global roles
     try:
         discord_name = ctx.message.author.name
         #print(ctx.message.author.name)
-        if "forum.everspace-game.com/profile/" not in url:
-            yield from bot.say('Please use an Everspace Forum URL')
-            return
+        url = "http://forum.everspace-game.com/profile/"+username
         r = requests.get(url)
         result = r.text
         bs = BeautifulSoup(result, "html5lib")
         rank = bs.find(attrs={"class": "Rank"})
-        forum_name = url.split("forum.everspace-game.com/profile/", 1)[1]
+        forum_name = username
         num_diff = 0
         for i,s in enumerate(difflib.ndiff(discord_name, forum_name)):
             if s[0]!=' ':
