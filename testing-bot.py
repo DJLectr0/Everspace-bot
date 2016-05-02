@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import difflib
 
-description = '''The bot for the unofficial Everspace Discord server. My master is DJ_Lectr0. If I do not behave please let him know.'''
+description = '''The bot for the unofficial Everspace Discord server. My master is DJ_Lectr0. If I do not behave please let him know. Open Sourced at: https://github.com/DJLectr0/Everspace-bot'''
 bot = commands.Bot(command_prefix=("~", "!", "/"), description=description, pm_help=True)
 roles = list()
 alpha_role = None
